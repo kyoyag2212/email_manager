@@ -36,13 +36,12 @@
   	    	<div class="card-header"> 
   	    		<h4 class="card-title text-center">Login</h4></div>
     <div class="card-body">
-    <form action="/action_page.php" class="was-validated">
+    <form action="/send_email" class="was-validated" method="POST">
   <div class="form-group">
-    <label for="emailselect">Enter GMAIL:</label>
+    <label for="emailselect">Select GMAIL:</label>
   <select name="emailselect" class="custom-select">
-    <option selected> Select Gmail </option>
-    <option value="gmail1">gmail1</option>
-    <option value="gmail2">gmail2</option>
+    <option selected value="email1">Primary Email</option>
+    <option value="email2">Secondary Email</option>
 
   </select>
   </div>
@@ -56,9 +55,13 @@
   <input type="email" class="form-control" id="tomail" placeholder="Enter Gmail of Receiver" name="tomail" required>
     <div class="valid-feedback">Valid.</div>
     <div class="invalid-feedback">Please fill out this field.</div>
+  <div class="form-group">
+    <label for="subject">Subject of Email:</label>
+      <textarea class="form-control" rows="1" id="subject" name="subject"></textarea>
+  </div>
  <div class="form-group">
   <label for="contentemail">Write Email:</label>
-  <textarea class="form-control" rows="5" id="contentemail"></textarea>
+  <textarea class="form-control" rows="5" id="contentemail" name="contentemail"></textarea>
 </div> 
 
   <button type="submit" class="btn btn-primary btn-block">Send</button>
