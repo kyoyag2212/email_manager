@@ -13,42 +13,49 @@ var SEmail = "";
 function Register (username,password,primary_email,secondary_email){
     var db = new sqlite3.Database('emailmanager');// Connect db 
     db.serialize(function() {
-        db.run("CREATE TABLE IF NOT EXISTS user_data (UID TEXT NOT NULL UNIQUE, PASS TEXTNOT NULL, PEMAIL TEXT NOT NULL, SEMAIL TEXT )",
+        db.run("CREATE TABLE IF NOT EXISTS userdata (UID TEXT NOT NULL UNIQUE, PASS TEXT NOT NULL, PEMAIL TEXT NOT NULL, SEMAIL TEXT )",
             (err) => {if(err){console.error(err.message)}});
       
-        var stmt = db.prepare("INSERT INTO user_data VALUES (?,?,?,?)");
+        var stmt = db.prepare("INSERT INTO userdata VALUES (?,?,?,?)");
         
         stmt.run(username,password,primary_email,secondary_email);
         
         stmt.finalize();
-
       });
     db.close();// Close connection
     return true;
 }
 //Authenticate User Login
-function Authenticate (username,password){
+async function Authenticate (username,password){
     var pass = "";
     var db = new sqlite3.Database('emailmanager');// Connect db
-    db.run("SELECT PASS, PEMAIL, SEMAIL FROM user_data WHERE UID = ?",username, function(err, row) {
-      if(err){
-        pass="";
-      }
-      else{
-            pass = row.PASS;
-            PEmail = row.PEMAIL;
-            SEmail = row.SEMAIL;
-      }
+    db.serialize(function(){
+      db.get("SELECT UID id, PASS pas, PEMAIL pe, SEMAIL se FROM userdata WHERE UID = ? ",username, function(err, row) {
+        if(err){
+          pass="";
+          console.error(err.message);
+        }
+          pass = row.pas;
+          PEmail = row.pe;
+          SEmail = row.se;
+        
         });
+    });
+    
     db.close();// Close connection
+
     if(pass == password){
         Username = username;
         return true;
     }
-    return false;
+    else{
+        return false;
+    }
+    
 }
 //Send Email
 function sendmail (sender,password,reciever,sub,msg){
+  var sent = false;
     var transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
@@ -66,52 +73,73 @@ function sendmail (sender,password,reciever,sub,msg){
       
       transporter.sendMail(mailOptions, function(error, info){
         if (error) {
-          console.log(error);
+          console.log(error.message);
         } else {
-          console.log('Email sent: ' + info.response);
+          sent = true;
         }
       });
+      return sent;
 }
 
 app.use(bodyParser.urlencoded({ extended: false }));
 
 // Route to Homepage
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/static/index.html');
-});
-
-// Route to Login Page
-app.get('/login', (req, res) => {
-  res.sendFile(__dirname + '/static/login.html');
+app.get('/home', (req, res) => {
+  res.sendFile(__dirname + '/static/home.html');
 });
 
 // Route to Login Page
 app.get('/register', (req, res) => {
-    res.sendFile(__dirname + '/static/register.html');
+  res.sendFile(__dirname + '/static/register.html');
+});
+
+// Route to Login Page
+app.get('/send_email', (req, res) => {
+    res.sendFile(__dirname + '/static/send_email.html');
   });
 
-app.post('/login', (req, res) => {
+app.post('/home', (req, res) => {
 
   // Insert Login Code Here
-  let username = req.body.username;
-  let password = req.body.password;
+  let username = req.body.uname;
+  let password = req.body.pswd;
   if(Authenticate(username,password)){
-    res.sendFile(__dirname + '/static/home.html');
+    res.sendFile(__dirname + '/static/send_email.html');
   }
   else{
-    res.sendFile(__dirname + '/static/login.html');
+    res.sendFile(__dirname + '/static/home.html');
   }
   
 });
 
-app.post('/home', (req, res) => {
+app.post('/register', (req, res) => {
 
-    let sender = req.body.sender;
-    let pass = req.body.pass;
-    let reciever = req.body.reciever;
-    let sub = req.body.sub;
-    let msg = req.body.msg;
+  let username = req.body.uname;
+  let password = req.body.pswd;
+  let pemail = req.body.email1;
+  let semail = req.body.email2;
 
+  if(Register(username,password,pemail,semail)){
+      res.sendFile(__dirname + '/static/home.html');
+  }
+  else{
+    res.sendFile(__dirname + '/static/register.html');
+  }
+  
+});
+
+app.post('/send_email', (req, res) => {
+    if(req.body.emailselect == "email1"){
+      var sender = PEmail;
+    }
+    else if(req.body.emailselect == "email2"){
+      var sender = SEmail;
+    }
+    let pass = req.body.gpswd;
+    let reciever = req.body.tomail;
+    let sub = req.body.subject;
+    let msg = req.body.contentemail;
+    console.log(sender + pass + reciever + sub + msg)
     if(sendmail(sender,pass,reciever,sub,msg)){
         res.send(`Mail Sent.`);
     }
