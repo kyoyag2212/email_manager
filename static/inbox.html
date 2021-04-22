@@ -1,0 +1,104 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Emailer-Inbox</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.5.1.js">
+    </script>
+ 
+</head>
+<body>
+<nav class="navbar navbar-expand-sm bg-dark navbar-dark justify-content-center">
+	 <ul class="navbar-nav">
+    <li class="nav-item">
+       <a class="navbar-brand" href="#">
+    <img src="images/image_logo.png" alt="logo" style="width:40px;">
+     
+  </ul>
+   <h1 class="display-5">Emailer</h1>
+  </a>
+
+ 
+  
+  
+</nav>
+<br>
+
+<div class="container-fluid">
+	<div class="row">
+  <div class="col-sm-3 col-md-6 col-lg-4 col-xl-2">
+     <img class="img-fluid float-left" src="images/side_image.png">
+  </div>
+  <div class="col-sm-9 col-md-6 col-lg-8 col-xl-10">
+  	    <div class="card bg-dark text-white">
+  	    	<div class="card-header"> 
+    
+  	    		<h4 class="card-title text-center">Inbox</h4></div>
+    <div class="card-body">
+    <div class="container">
+          
+        <!-- TABLE CONSTRUCTION-->
+        <table id='table'  class="table table-dark table-hover">
+            <!-- HEADING FORMATION -->
+            <tr>
+                <th>Sender</th>
+                <th>Mail</th>
+
+            </tr>
+  
+            <script>
+                $(document).ready(function () {
+  
+                   
+                   // FETCHING DATA FROM JSON FILE
+                    $.getJSON("mails.json", 
+                            function (data) {
+                        var mail = '';
+
+  
+                        // ITERATING THROUGH OBJECTS
+                        $.each(data, function (key, value) {
+                          
+  
+                            //CONSTRUCTION OF ROWS HAVING
+                            // DATA FROM JSON OBJECT
+                            mail += '<tr>';
+                            mail += '<td>' + 
+                              value.sender+'</td>';
+  
+                            mail += '<td>' + 
+                              value.email+ '</td>';
+  
+                            
+                        });
+                          
+                        //INSERTING ROWS INTO TABLE 
+                        $('#table').append(mail);
+                    });
+                });
+            </script>
+</div>
+  </div>
+  </div>
+ 
+
+    <br>
+ 
+  </div>
+  
+
+  
+</div>
+
+  </div>
+</div>
+
+    
+</body>
+
+</html> 
